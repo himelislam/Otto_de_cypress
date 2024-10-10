@@ -25,7 +25,7 @@ describe('OTTO Product Add to Cart Verification', () => {
     // Retrive the first five product prices
     const prices = []
     for (let i = 1; i <= 5; i++) {
-      cy.get(`[data-qa="ftfind-roduct-${i}"]`)
+      cy.get(`[data-qa="ftfind-product-${i}"]`)
         .find('.find_tile__priceContainer .find_tile__retailPrice')
         .invoke('text')
         .then((priceText) => {
