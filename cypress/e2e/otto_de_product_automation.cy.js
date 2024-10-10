@@ -1,4 +1,13 @@
 describe('OTTO Product Add to Cart Verification', () => {
+
+  beforeEach(() => {
+    // Handaling screenshot and error messages on each fail.
+    Cypress.on('fail', (error) => {
+      cy.screenshot();
+      throw error;
+    });
+  });
+
   it('should verify the product sorting filtering and adds product to the cart', () => {
 
     // visits the website
@@ -11,12 +20,12 @@ describe('OTTO Product Add to Cart Verification', () => {
     cy.get('#heureka_desktopSorting--select--cloned').select('preis-absteigend')
 
     // waits for the products to get sorted
-    cy.wait(4000);
+    cy.wait(2000);
 
     // Retrive the first five product prices
     const prices = []
     for (let i = 1; i <= 5; i++) {
-      cy.get(`[data-qa="ftfind-product-${i}"]`)
+      cy.get(`[data-qa="ftfind-roduct-${i}"]`)
         .find('.find_tile__priceContainer .find_tile__retailPrice')
         .invoke('text')
         .then((priceText) => {
@@ -34,13 +43,13 @@ describe('OTTO Product Add to Cart Verification', () => {
     cy.get('.pl_accordion__header:first').click()
 
     cy.get('#heureka_slider_1__minInput')
-      .type('500', { force: true })
+      .type('500')
 
     cy.get('#heureka_slider_1__minInput')
       .should('have.value', '500');
 
     cy.get('#heureka_slider_1__maxInput')
-      .type('1000', { force: true })
+      .type('1000')
 
     cy.get('#heureka_slider_1__maxInput')
       .should('have.value', '1000')
@@ -73,7 +82,7 @@ describe('OTTO Product Add to Cart Verification', () => {
       .first() 
       .invoke('attr', 'data-pi')
       .then((productIdfromCart) => {
-        cy.log('Data-pi value:', productIdfromCart); 
+        cy.log('productId from Cart:', productIdfromCart); 
         expect(productIdfromCart).to.equal(productId); 
       });
   })
