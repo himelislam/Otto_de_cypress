@@ -1,16 +1,6 @@
 describe('OTTO Product Add to Cart Verification', () => {
 
   beforeEach(() => {
-    // Handaling screenshot and error messages on each fail.
-    Cypress.on('fail', (error) => {
-      cy.screenshot();
-      cy.log('error from fail', error)
-      throw error;
-    });
-  });
-
-  it('should verify the product sorting filtering and adds product to the cart', () => {
-
     // visits the website
     cy.visit('https://www.otto.de/')
 
@@ -22,11 +12,21 @@ describe('OTTO Product Add to Cart Verification', () => {
     cy.url().should('include', '/suche/trampolin/');
 
     cy.get('#heureka_desktopSorting--select--cloned').select('preis-absteigend')
+    .should('have.value', 'preis-absteigend');
     cy.url().should('include', '/suche/trampolin/?sortiertnach=preis-absteigend')
 
     // waits for the products to get sorted
-    cy.wait(2000);
+    cy.wait(3000);
 
+    // Handaling screenshot and error messages on each fail.
+    Cypress.on('fail', (error) => {
+      cy.screenshot();
+      cy.log('error from fail', error)
+      throw error;
+    });
+  });
+
+  it('should verify prices are in descending order', () => {
     // Retrive the first five product prices
     const prices = []
     for (let i = 1; i <= 5; i++) {
@@ -40,9 +40,12 @@ describe('OTTO Product Add to Cart Verification', () => {
         });
     }
 
-    // Checks the products prices array is descending
+    // Checks the products prices array is descending order
     const isDescending = prices.every((price, index) => index === 0 || price <= prices[index - 1]);
     expect(isDescending).to.be.true;
+  })
+
+  it('should filter the products with price range from 500 to 1000', ()=>{
 
     // Filter the products by price range
     cy.get('.pl_accordion__header:first').click()
@@ -63,8 +66,10 @@ describe('OTTO Product Add to Cart Verification', () => {
     cy.url().should('include', '/suche/trampolin/?preis-in-eur~ab=500&preis-in-eur~bis=1000&sortiertnach=preis-absteigend');
 
     // waits for the products to get filtered
-    cy.wait(4000)
+    cy.wait(3000);
+  })
 
+  it('should verify the selected product added to the cart', ()=>{
     // Store the product Id to verify later with the cart
     let productId;
     cy.get('article[data-product-id]')
