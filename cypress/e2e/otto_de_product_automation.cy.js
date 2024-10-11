@@ -4,6 +4,7 @@ describe('OTTO Product Add to Cart Verification', () => {
     // Handaling screenshot and error messages on each fail.
     Cypress.on('fail', (error) => {
       cy.screenshot();
+      cy.log('error from fail', error)
       throw error;
     });
   });
@@ -16,8 +17,12 @@ describe('OTTO Product Add to Cart Verification', () => {
     // search for trampolin and sort the pricing to highest first
     cy.get('input[data-testid="squirrel-searchfield"]').type("trampolin")
     .should('have.value', 'trampolin')
+
     cy.get('div[data-testid="search-field-submit"]').click()
+    cy.url().should('include', '/suche/trampolin/');
+
     cy.get('#heureka_desktopSorting--select--cloned').select('preis-absteigend')
+    cy.url().should('include', '/suche/trampolin/?sortiertnach=preis-absteigend')
 
     // waits for the products to get sorted
     cy.wait(2000);
@@ -55,6 +60,7 @@ describe('OTTO Product Add to Cart Verification', () => {
       .should('have.value', '1000')
 
     cy.get('.find_filter__select--range:not([disabled])').click({ force: true })
+    cy.url().should('include', '/suche/trampolin/?preis-in-eur~ab=500&preis-in-eur~bis=1000&sortiertnach=preis-absteigend');
 
     // waits for the products to get filtered
     cy.wait(4000)
@@ -66,18 +72,19 @@ describe('OTTO Product Add to Cart Verification', () => {
     .invoke('attr', 'data-product-id')
     .then((id) => {
       productId = id; 
+      expect(productId).to.exist;
       cy.log('Product ID:', productId); 
     });
-
+    
     cy.get('.find_tile__header').eq(1).click();
-
+    
     // waits for to render the product page
     cy.wait(3000);
 
     // add the product to cart
     cy.get('[data-qa="addToBasket"]').click();
 
-    // retrive frist product id from cart and checks with the productID
+    // retrive first product id from cart to verify with the productID
     cy.get('[data-pi]')
       .first() 
       .invoke('attr', 'data-pi')
